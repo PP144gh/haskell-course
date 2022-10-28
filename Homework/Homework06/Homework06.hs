@@ -174,7 +174,8 @@ deliveryCost :: Double
 deliveryCost = 8.50
 
 beercost :: [(String, Double)] -> Double
-beercost = foldl' (+) deliveryCost . zipWith' (\(_,price) (_,qty)  -> qty * price) bevogBeerPrices
+--beercost orderlist = foldl' (+) deliveryCost $ zipWith' (\(_,price) (_,qty)  -> qty * price) orderlist bevogBeerPrices
+beercost = foldl' (+) deliveryCost . zipWith' (\(_,price) (_,qty)  -> qty * price) bevogBeerPrices -- with partial application
 
 -- prof solutions
 
