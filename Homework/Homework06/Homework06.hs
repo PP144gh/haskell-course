@@ -177,6 +177,12 @@ beercost :: [(String, Double)] -> Double
 --beercost orderlist = foldl' (+) deliveryCost $ zipWith' (\(_,price) (_,qty)  -> qty * price) orderlist bevogBeerPrices
 beercost = foldl' (+) deliveryCost . zipWith' (\(_,price) (_,qty)  -> qty * price) bevogBeerPrices -- with partial application
 
+
+beercost' :: [(String, Double)] -> Double
+beercost' =
+  foldr (+) deliveryCost
+    . zipWith (*) (map snd bevogBeerPrices)
+    . map snd
 -- prof solutions
 
 {-
@@ -192,7 +198,7 @@ beerCosts =
 -- my lambda function does the same as his composition of functions after the foldr. it starts by filtering bevogBeerPrices to only contain the name fields which are in the order.
 -- then takes the quantity and mutiplies by the price, yielding a list of prices, ordered by the name of the beers.
 
--- in my solution I avoid the initial filtering, since zipWith' already has this built in, it will only compute a number of times equal to the length of the smaller list.
+-- in my solution I avoid the initial filtering, since zipWith' already has this built in, it will only zip a number of times equal to the length of the smaller list.
 -- the map uses are equivalent to my lambda function definition. the rest is equivalent.
 
 -}
@@ -510,4 +516,5 @@ print(takeWhile' (< 0) [1,2,3])
 -- []
 print(func 5)
 --print(snd orderList)
+print(beercost' orderList)
 print(beercost orderList)
