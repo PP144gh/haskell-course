@@ -5,6 +5,7 @@
 --
 {-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
 import Data.List (foldl')
+import DynFlags (supportedLanguagesAndExtensions)
 {-# HLINT ignore "Use foldr" #-}
 
 repeat' :: Enum a => a -> [a]
@@ -172,10 +173,28 @@ orderList =
 deliveryCost :: Double
 deliveryCost = 8.50
 
+beercost :: [(String, Double)] -> Double
+beercost orderlist = foldl' (+) deliveryCost $ zipWith' (\(_,qty) (_,price) -> qty * price) orderlist bevogBeerPrices
 
-costf orderlist pricelist del_cost = foldl' (\(oname,qty) (name,price) -> if oname == name then qty*price else 0) orderList pricelist
+-- prof solutions
+
+{-
+
+beerCosts :: [(String, Double)] -> Double
+beerCosts =
+  foldr (+) deliveryCost
+    . zipWith (*) (map snd bevogBeerPrices)
+    . map snd
+    . filter (\name -> fst name `elem` map fst bevogBeerPrices)
 
 
+-- my lambda function does the same as his composition of functions after the foldr. it starts by filtering bevogBeerPrices to only contain the name fields which are in the order.
+-- then takes the quantity and mutiplies by the price, yielding a list of prices, ordered by the name of the beers.
+
+-- in my solution I avoid the initial filtering, since zipWith' already has this built in, it will only compute a number of times equal to the length of the smaller list.
+-- the map uses are equivalent to my lambda function definition. the rest is equivalent.
+
+-}
 
 
 --- NOTES
@@ -489,3 +508,5 @@ print(takeWhile' (< 9) [1,2,3])
 print(takeWhile' (< 0) [1,2,3])
 -- []
 print(func 5)
+--print(snd orderList)
+print(beercost orderList)
