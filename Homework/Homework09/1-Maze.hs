@@ -53,3 +53,156 @@ still need to make another choice.
 
 6. Adapt adapt "solveMaze" function to use "showCurrentChoice" and play with your new game using GHCi! :D
 -}
+
+
+
+{-
+--1sr try
+
+
+
+data Move = GoLeft | GoRight | GoForward deriving (Show,Eq)
+
+infixr 5 :->
+data Maze a = End | HitWall | a :-> (Maze a) deriving (Show,Eq)
+
+testMaze :: Maze Move
+testMaze= GoForward :-> GoLeft :-> End
+
+
+move :: Maze Move-> Move -> Maze Move
+move End _ = End
+move HitWall _ = HitWall
+move (y :-> ys) moove
+    | y == moove = ys 
+    | otherwise = HitWall
+
+
+solveMaze:: Maze Move -> [Move] -> String
+solveMaze maze xs = showCurrentChoice (foldl move maze xs) 
+
+
+showCurrentChoice :: Maze Move -> String
+showCurrentChoice maze 
+    | maze == HitWall = "You've hit a wall!"
+    | maze == End = "YOU'VE FOUND THE EXIT!!"
+    | otherwise = "You're still inside the maze. Choose a path, brave adventurer: GoLeft, GoRight, or GoForward."
+
+-}
+
+
+{-
+prof solution
+
+
+-- Step 1
+data Move = GoForward | GoLeft | GoRight
+
+data Maze = FoundExit | HitWall | Passage Maze Maze Maze deriving (Show)
+
+-- Step 2
+move :: Maze -> Move -> Maze
+move HitWall _ = HitWall
+move FoundExit _ = FoundExit
+move (Passage x _ _) GoLeft = x
+move (Passage _ x _) GoForward = x
+move (Passage _ _ x) GoRight = x
+
+-- Step 3
+testMaze :: Maze
+testMaze = Passage HitWall (Passage FoundExit HitWall HitWall) (Passage HitWall (Passage HitWall HitWall HitWall) HitWall)
+
+-- Step 4
+solveMaze' :: Maze -> [Move] -> Maze
+solveMaze' = foldl move
+
+-- Step 5
+showCurrentChoice :: Maze -> String
+showCurrentChoice HitWall = "You've hit a wall!"
+showCurrentChoice FoundExit = "YOU'VE FOUND THE EXIT!!"
+showCurrentChoice _ = "You're still inside the maze. Choose a path, brave adventurer: GoLeft, GoRight, or GoForward."
+
+-- Step 6
+solveMaze :: Maze -> [Move] -> String
+solveMaze l m = showCurrentChoice $ foldl move l m
+
+
+-}
+
+
+
+
+--2nd try
+
+
+
+data Move = GoLeft | GoRight | GoForward deriving (Show,Eq)
+
+
+data Maze = End | HitWall | Passage Maze Maze Maze  deriving (Show,Eq)
+
+testMaze :: Maze 
+testMaze = Passage HitWall (Passage End HitWall HitWall) (Passage HitWall (Passage HitWall HitWall HitWall) HitWall)
+
+
+move :: Maze-> Move -> Maze
+move End _ = End
+move HitWall _ = HitWall
+move (Passage x _ _) GoLeft = x
+move (Passage _ x _) GoForward = x
+move (Passage _ _ x) GoRight = x
+
+
+solveMaze:: Maze -> [Move] -> String
+solveMaze maze xs = showCurrentChoice (foldl move maze xs) 
+
+
+showCurrentChoice :: Maze -> String
+showCurrentChoice maze 
+    | maze == HitWall = "You've hit a wall!"
+    | maze == End = "YOU'VE FOUND THE EXIT!!"
+    | otherwise = "You're still inside the maze. Choose a path, brave adventurer: GoLeft, GoRight, or GoForward."
+
+-- my 1st solution didn't allow for a complex maze where paths bifurcate. It only solved the problem for a maze that has only one way to go, and all the other options are walls.
+-- The data definition of maze could be generalised to allow for a more complex maze, but all possible paths would have to be defined in the test maze, starting from the first step, making it very cumbersome for
+-- very complex mazes.
+
+main :: IO ()
+main = do
+
+
+--let moves = [GoForward]
+--let moves2 = [GoLeft,GoForward]
+
+{-
+*Main> solveMaze testMaze []
+"You're still inside the maze. Choose a path, brave adventurer: GoLeft, GoRight, or GoForward."
+*Main> solveMaze testMaze [GoLeft]
+"You've hit a wall!"
+*Main> solveMaze testMaze [GoForward]
+"You're still inside the maze. Choose a path, brave adventurer: GoLeft, GoRight, or GoForward."
+*Main> solveMaze testMaze [GoForward, GoRight]
+"You've hit a wall!"
+*Main> solveMaze testMaze [GoForward, GoLeft]
+"YOU'VE FOUND THE EXIT!!"
+-}
+
+print(solveMaze testMaze [])
+print(solveMaze testMaze [GoLeft])
+print(solveMaze testMaze [GoRight])
+print(solveMaze testMaze [GoRight,GoForward])
+print(solveMaze testMaze [GoRight,GoForward,GoForward])
+
+
+print(solveMaze testMaze [GoForward])
+print(solveMaze testMaze [GoForward, GoRight])
+print(solveMaze testMaze [GoForward, GoLeft])
+
+
+print(solveMaze testMaze [GoRight])
+print(solveMaze testMaze [GoRight, GoLeft])
+print(solveMaze testMaze [GoRight, GoForward, GoLeft])
+
+--print(move testMaze (head moves))
+--print(solveMaze testMaze moves)
+--print(solveMaze testMaze moves2)
